@@ -1,0 +1,44 @@
+[
+  {
+    "action": "create",
+    "time": "00-00-00",
+    "sessionToken": "assdghgj",
+    "name": "test",
+    "icon": "todo"
+  },
+  {
+    "action": "clone",
+    "time": "00-00-00",
+    "sessionToken": "assdghgj",
+    "nameTree": {
+      "name": "test1",
+      "icon": "todo",
+      "child": {
+        "name": "test2",
+        "icon": "todo",
+        "child": {
+          "name": "test3",
+          "icon": "todo"
+        }
+      }
+    }
+},
+  {
+    "action": "clone",
+    "time": "00-00-00",
+    "sessionToken": "assdghgj",
+    "nameTree": {
+      "name": "test1",
+      "icon": "todo",
+      "child": {
+        "name": "test2",
+        "icon": "todo",
+        "child": {
+          "name": "test3",
+          "icon": "todo"
+        }
+      }
+    }
+  }
+
+]

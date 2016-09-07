@@ -1,0 +1,83 @@
+@font-face {
+    font-family: SourceSansPro;
+    src: url('source-sans-pro/SourceSansPro-Regular.otf');
+}
+
+@font-face {
+    font-family: SourceSansPro;
+    font-weight: bold;
+    src: url('source-sans-pro/SourceSansPro-Bold.otf');
+}
+
+.icon-name-holder {
+    overflow: inherit;
+}
+
+.icon-name-holder div {
+    position: relative;
+}
+
+body {
+    background-color: #232323;
+    margin: 0;
+}
+
+* {
+    color: #fff;
+    font-family: SourceSansPro;
+    font-size:18px;
+}
+
+table {
+    width: 74%;
+    border: none;
+    border-collapse: collapse;
+}
+
+table tr {
+    height: 60px;
+    transition: height 1s ease-in-out;
+}
+
+table td {
+    text-align:center;
+    vertical-align:middle;
+    padding: 0;
+}
+
+table td:nth-child(2) {
+    text-align:right;
+    width: 160px;
+}
+
+table td:nth-child(1) {
+    width: 14px;
+}
+
+table td:nth-child(4), table td:nth-child(5) {
+    border-right: 1px solid #565656;
+}
+
+table td:nth-child(3) {
+    text-align:left;
+    border-right: 1px solid #565656;
+}
+
+table td:nth-child(4) {
+    width: 240px;
+}
+
+table td:nth-child(5) {
+    width: 200px;
+}
+
+table td:last-child {
+    border-right: none;
+    width: 270px;
+}
+table td > div.tranistion-row {
+  height: 0;
+}
+table td > div {
+
+}

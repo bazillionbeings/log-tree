@@ -2,7 +2,7 @@
   'use strict';
   const HOST = 'http://localhost:4242/';
   const ROW_HEIGHT = 60;
-  const CLONE_COUNT = 30;
+  const CLONE_COUNT = 100;
   const REFRESH_INTERVAL = 1000;
 
   function getParameterByName(name, url) {
@@ -24,6 +24,85 @@
     amount = Math.floor($(window).outerHeight() / ROW_HEIGHT);
   });
 
+  function getNewJQItem(item) {
+    const $tr = $('<tr>');
+
+    if (item.action === 'clone') {
+      let $td = $('<td>');
+      $tr.append($td);
+      let $div = $('<div>');
+      $td.append($div);
+      $div.css('background-color', item.color.substring(0, item.color.length - 2));
+
+      $td = $('<td>');
+      $tr.append($td);
+      $div = $('<div>');
+      $td.append($div);
+      item.parentIds.reverse().forEach(parentId => {
+        let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${parentId}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
+        $div.append($img);
+      });
+
+      let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${item.service_id}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
+      $div.append($img);
+    } else {
+      let $td = $('<td>');
+      $tr.append($td);
+      let $div = $('<div>');
+      $td.append($div);
+      $td = $('<td>');
+      $tr.append($td);
+      $div = $('<div>');
+      $td.append($div);
+      let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${item.service_id}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
+      $div.append($img);
+    }
+    let $td = $('<td>');
+    $tr.append($td);
+    let $div = $('<div>');
+    $td.append($div);
+    $div.html(`<b>${item.name}</b> ${item.message}`);
+
+    $td = $('<td>');
+    $div = $('<div>');
+    $td.append($div);
+
+    (function(item, $div) {
+      let seconds = Math.round(item.creationTimeAgo / 1000);
+      let startTime = new Date().getTime();
+      let originalCreationTime = item.creationTimeAgo;
+      let interval = setInterval(() => {
+        let curentTime = new Date().getTime();
+        let result = seconds + Math.round((curentTime - startTime) / 1000);
+        item.creationTimeAgo = originalCreationTime + (curentTime - startTime);
+        if (result > 60) {
+          let minutes = Math.round(result / 60);
+          $div.html(minutes + (minutes > 1 ? ' minutes ago': ' minute ago'));
+        } else {
+          $div.html(result + (result > 1 ? ' seconds ago': ' second ago'));
+        }    
+      },1000);
+      item.interval = interval;
+    }) (item, $div);
+    let seconds = Math.round(item.creationTimeAgo / 1000);
+    if (seconds > 60) {
+      let minutes = Math.round(seconds / 60);
+      $div.html(minutes + (minutes > 1 ? ' minutes ago': ' minute ago'));
+    } else {
+      $div.html(seconds + (seconds > 1 ? ' seconds ago': ' second ago'));
+    }
+    $tr.append($td);
+
+    $td = $('<td>');
+    $div = $('<div>');
+    $td.append($div);
+    $div.html(item.session_id.substring(0, 20));
+    $tr.append($td);
+    $.data($tr, item);
+    item.element = $tr;
+    return $tr;
+  }
+
   function formatList(unformattedList) {
     function insert(item) {
       if (list.length < amount) {
@@ -32,22 +111,47 @@
         let lowestCount = Number.MAX_VALUE;
         let lowestCountItems = [];
         list.forEach((item, i) => {
-          if (item.count < lowestCount) {
-            lowestCountItems = [];
-            lowestCountItems.push(item);
-            lowestCount = item.count;
-          } else if (item.count === lowestCount) {
-            lowestCountItems.push(item);
-          }
+          if(item.state !== 'deleting') {
+            if (item.count < lowestCount) {
+              lowestCountItems = [];
+              lowestCountItems.push(item);
+              lowestCount = item.count;
+            } else if (item.count === lowestCount) {
+              lowestCountItems.push(item);
+            }  
+          }          
         });
-        lowestCountItems.sort((a, b) => a.creationTimeAgo - b.coucreationTimeAgont);
+        lowestCountItems.sort((a, b) => a.creationTimeAgo - b.creationTimeAgo);
 
         let deleteItem = lowestCountItems[lowestCountItems.length - 1];
-        let deleteIndex = list.indexOf(deleteItem);
-        $(`table tr:nth-child(${deleteIndex + 1})`).class()
-        list[deleteIndex] = item;
+        console.log(deleteItem);        
+        deleteItem.state = 'deleting';
+
+        
+
+        let $tr = getNewJQItem(item);
+        list.unshift(item);
+        $tr.find('div').addClass('tranistion-row');
+        $('table').prepend($tr);
+
+        (function(deleteItem, $tr) {
+          let counter = 0;
+          setTimeout(() => {            
+            deleteItem.element.find(`td > div`).addClass('tranistion-row')
+              .one('transitionend ', (event) => {
+                counter++;
+                if (counter === 5) {
+                  deleteItem.element.remove();
+                  clearInterval(deleteItem.interval);
+                  list.splice(list.indexOf(deleteItem), 1);
+                }
+              });
+              
+            $tr.find('div').removeClass('tranistion-row');
+            
+          }, 100);
+        })(deleteItem, $tr);
       }
-      list.sort((a, b) => a.creationTimeAgo - b.creationTimeAgo);
     }
 
     if (!list) {
@@ -58,6 +162,11 @@
           listItem.count = 0;
         }
         return listItem;
+      });
+      list.sort((a, b) => a.creationTimeAgo - b.creationTimeAgo);
+      list.forEach(item => {
+        let $tr = getNewJQItem(item);
+        $table.append($tr);
       });
     } else {
       let newItems = [];
@@ -79,7 +188,6 @@
           insert(newItem);
         }
       }
-
     }
   }
 
@@ -89,63 +197,16 @@
   setInterval(() => {
     $.get(`${HOST}v1/me/log?amount=${amount}&lastId=${lastId}`, data => {
       if (data && data.data) {
-        formatList(data.data);
-        $table.html('');
-        list.forEach(item => {
-          const $tr = $('<tr>');
-          $table.append($tr);
-
-          if (item.action === 'clone') {
-            let $td = $('<td>');
-            $tr.append($td);
-            $td.css('background-color', item.color.substring(0, item.color.length - 2));
-
-            $td = $('<td>');
-            $tr.append($td);
-            item.parentIds.reverse().forEach(parentId => {
-              let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${parentId}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
-              $td.append($img);
-            });
-
-            let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${item.service_id}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
-            $td.append($img);
-          } else {
-            let $td = $('<td>');
-            $tr.append($td);
-            $td = $('<td>');
-            $tr.append($td);
-            let $img = $('<img>').attr('src', `${HOST}v1/me/serviceFile/${item.service_id}/lifo_x1_phone.png`).attr('height', 55).attr('width', 55);
-            $td.append($img);
-          }
-          let $td = $('<td>');
-          $tr.append($td);
-          const $div = $('<div>');
-          $div.addClass('icon-name-holder');
-          $td.append($div);
-
-          const $divNameIcon = $('<div>');
-          $divNameIcon.html(`<b>${item.name}</b> ${item.message}`);
-          $div.append($divNameIcon);
-
-          $td = $('<td>');
-          if (item.creationTimeAgo > 60) {
-            let minutes = Math.round(item.creationTimeAgo / 60);
-            $td.html(minutes + (minutes > 1 ? ' minutes ago': ' minute ago'));
-          } else {
-            $td.html(item.creationTimeAgo + (item.creationTimeAgo > 1 ? ' secondes ago': ' seconde ago'));
-          }
-          $tr.append($td);
-
-          $td = $('<td>');
-          $td.html(item.session_id.substring(0, 20));
-          $tr.append($td);
-        });
-        list.forEach(item => {
-          item.count -= 1;
+        data = data.data;
+        data.forEach(item => {
           if (item.id > lastId) lastId = item.id;
         });
+        data = data.splice(0, amount);
+        formatList(data);        
       }
-      list.forEach(item => item.count -= 1);
+      list.forEach(item => {
+        item.count = item.count > 0 ? item.count - 1: 0;
+      });
     });
   }, REFRESH_INTERVAL);
 

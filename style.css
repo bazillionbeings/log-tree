@@ -9,14 +9,6 @@
     src: url('source-sans-pro/SourceSansPro-Bold.otf');
 }
 
-.icon-name-holder {
-    overflow: inherit;
-}
-
-.icon-name-holder div {
-    position: relative;
-}
-
 body {
     background-color: #232323;
     margin: 0;
@@ -34,20 +26,31 @@ table {
     border-collapse: collapse;
 }
 
-table tr {
-    height: 60px;
-    transition: height 1s ease-in-out;
+table td {
+  padding: 0;
 }
 
-table td {
-    text-align:center;
-    vertical-align:middle;
-    padding: 0;
+table td > div {
+  height: 60px;
+  line-height: 60px;
+  transition: height 0.3s ease-in-out;
+  transform: translate3d(0,0,0);
+  text-align:center;
+  vertical-align:middle;
+  padding: 0;
+  background-color: #232323;
+}
+
+table td * {
+  overflow: hidden;
 }
 
 table td:nth-child(2) {
-    text-align:right;
     width: 160px;
+}
+
+table td:nth-child(2) > div {
+    text-align:right;
 }
 
 table td:nth-child(1) {
@@ -63,6 +66,10 @@ table td:nth-child(3) {
     border-right: 1px solid #565656;
 }
 
+table td:nth-child(3) > div {
+    text-align:left;
+}
+
 table td:nth-child(4) {
     width: 240px;
 }
@@ -75,9 +82,7 @@ table td:last-child {
     border-right: none;
     width: 270px;
 }
-table td > div.tranistion-row {
-  height: 0;
-}
-table td > div {
 
+table td > div.tranistion-row {
+    height: 0;
 }

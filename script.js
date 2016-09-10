@@ -1,8 +1,8 @@
 (function() {
   'use strict';
-  const HOST = 'http://localhost:4242/';
+  const HOST = 'http://54.149.208.215:8880/';
   const ROW_HEIGHT = 60;
-  const CLONE_COUNT = 100;
+  const CLONE_COUNT = 20;
   const REFRESH_INTERVAL = 1000;
 
   function getParameterByName(name, url) {
@@ -80,7 +80,7 @@
           $div.html(minutes + (minutes > 1 ? ' minutes ago': ' minute ago'));
         } else {
           $div.html(result + (result > 1 ? ' seconds ago': ' second ago'));
-        }    
+        }
       },1000);
       item.interval = interval;
     }) (item, $div);
@@ -118,16 +118,16 @@
               lowestCount = item.count;
             } else if (item.count === lowestCount) {
               lowestCountItems.push(item);
-            }  
-          }          
+            }
+          }
         });
         lowestCountItems.sort((a, b) => a.creationTimeAgo - b.creationTimeAgo);
 
         let deleteItem = lowestCountItems[lowestCountItems.length - 1];
-        console.log(deleteItem);        
+        console.log(deleteItem);
         deleteItem.state = 'deleting';
 
-        
+
 
         let $tr = getNewJQItem(item);
         list.unshift(item);
@@ -136,7 +136,7 @@
 
         (function(deleteItem, $tr) {
           let counter = 0;
-          setTimeout(() => {            
+          setTimeout(() => {
             deleteItem.element.find(`td > div`).addClass('tranistion-row')
               .one('transitionend ', (event) => {
                 counter++;
@@ -146,9 +146,9 @@
                   list.splice(list.indexOf(deleteItem), 1);
                 }
               });
-              
+
             $tr.find('div').removeClass('tranistion-row');
-            
+
           }, 100);
         })(deleteItem, $tr);
       }
@@ -202,11 +202,14 @@
           if (item.id > lastId) lastId = item.id;
         });
         data = data.splice(0, amount);
-        formatList(data);        
+        formatList(data);
       }
-      list.forEach(item => {
-        item.count = item.count > 0 ? item.count - 1: 0;
-      });
+      if (list) {
+        list.forEach(item => {
+          item.count = item.count > 0 ? item.count - 1: 0;
+        });
+      }
+
     });
   }, REFRESH_INTERVAL);
 

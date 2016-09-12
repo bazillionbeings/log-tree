@@ -1,6 +1,7 @@
 (function() {
   'use strict';
   const HOST = 'http://54.149.208.215:8880/';
+  // const HOST = 'http://192.168.4.56:4242/';
   const ROW_HEIGHT = 60;
   const CLONE_COUNT = 20;
   const REFRESH_INTERVAL = 1000;
